@@ -1,0 +1,8 @@
+#
+collectedDir: /Users/gsc/PycharmProjects/vocal-seagull-aws/collected
+curl: /usr/bin/curl -L -s
+baseUrl: http://w1.weather.gov/xml/current_obs/
+#
+awsAccessKey: bogus
+awsSecretKey: bogus
+#
