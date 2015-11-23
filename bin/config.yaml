@@ -1,0 +1,21 @@
+#
+curlCommand: /usr/bin/curl -L -s
+#
+#gzipCommand: /opt/local/bin/gzip
+gzipCommand: /bin/gzip
+#
+#tarCommand: /usr/bin/tar
+tarCommand: /bin/tar
+#
+collectedDir: /var/vocal/seagull/collected
+#
+mySqlUserName: seagull
+mySqlPassWord: bogus
+mySqlDataBase: vocal_seagull
+mySqlHostName: localhost
+#
+awsAccessKey: bogus
+awsSecretKey: bogus
+#
+baseUrl: http://w1.weather.gov/xml/current_obs/
+#

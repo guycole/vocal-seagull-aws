@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Title:WxCollector.py
-# Description: Collect stations contained in stations.dat
+# Description: collect weather observations
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
 #
@@ -24,7 +24,7 @@ class WxCollector:
 
         for station in stations:
             file_name = "%s.%d" % (station, time_now)
-            command = "%s %s%s.xml > %s" % (curl, base_url, station, file_name)
+            command = "%s %s%s.xml > %s" % (curl_command, base_url, station, file_name)
             system(command)
 
     def execute(self):
@@ -60,11 +60,16 @@ if __name__ == '__main__':
     configuration = yaml.load(file(fileName))
 
     collected_dir = configuration['collectedDir']
-    curl = configuration['curl']
+    curl_command = configuration['curlCommand']
     base_url = configuration['baseUrl']
 
-    collector = WxCollector()
-    collector.execute()
+    try:
+        driver = WxCollector()
+        driver.execute()
+    except:
+        print 'exception'
+    finally:
+        print 'finally'
 
 print 'stop WxCollector'
 
