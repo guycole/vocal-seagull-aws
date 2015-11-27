@@ -20,11 +20,12 @@ class WxCollector:
         """
         time_now = int(round(time.time()));
 
-        os.chdir(collected_dir)
+        collection_dir = "%s/%s" % (seagull_path, seagull_dir)
+        os.chdir(collection_dir)
 
         for station in stations:
             file_name = "%s.%d" % (station, time_now)
-            command = "%s %s%s.xml > %s" % (curl_command, base_url, station, file_name)
+            command = "%s http://w1.weather.gov/xml/current_obs/%s.xml > %s" % (curl_command, station, file_name)
             system(command)
 
     def execute(self):
@@ -59,9 +60,10 @@ if __name__ == '__main__':
 
     configuration = yaml.load(file(fileName))
 
-    collected_dir = configuration['collectedDir']
     curl_command = configuration['curlCommand']
-    base_url = configuration['baseUrl']
+
+    seagull_path = configuration['seagullPath']
+    seagull_dir = configuration['seagullDir']
 
     try:
         driver = WxCollector()

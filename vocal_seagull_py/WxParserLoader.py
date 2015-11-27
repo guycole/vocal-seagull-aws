@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Title:WxParserLoader.py
-# Description:
+# Description: parse raw weather files and load into MySQL
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
 #
@@ -24,9 +24,11 @@ class WxParserLoader:
         success = 0
         failure = 0
 
-        targets = os.listdir(collected_dir)
+        collection_dir = "%s/%s" % (seagull_path, seagull_dir)
+
+        targets = os.listdir(collection_dir)
         for target in targets:
-            file_name = "%s/%s" % (collected_dir, target)
+            file_name = "%s/%s" % (collection_dir, target)
 
             parser = WxXmlParser()
             parser.execute(file_name)
@@ -36,8 +38,6 @@ class WxParserLoader:
                 success = success+1
             else:
                 failure = failure+1
-
-            os.remove(file_name)
 
         print "end success:%d failure:%d" % (success, failure)
 
@@ -54,6 +54,9 @@ if __name__ == '__main__':
 
     configuration = yaml.load(file(fileName))
 
+    seagull_path = configuration['seagullPath']
+    seagull_dir = configuration['seagullDir']
+
     mysql_username = configuration['mySqlUserName']
     mysql_password = configuration['mySqlPassWord']
     mysql_database = configuration['mySqlDataBase']
@@ -65,10 +68,13 @@ if __name__ == '__main__':
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    collected_dir = configuration['collectedDir']
-
-    wxParserLoader = WxParserLoader()
-    wxParserLoader.execute()
+    try:
+        wxParserLoader = WxParserLoader()
+        wxParserLoader.execute()
+    except:
+        print 'exception'
+    finally:
+        print 'finally'
 
 print 'stop WxParserLoader'
 

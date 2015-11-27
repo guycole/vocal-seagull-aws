@@ -1,13 +1,17 @@
 #
-curlCommand: /usr/bin/curl -L -s
+curlCommand: /opt/local/bin/curl -L -s
+#curlCommand: /usr/bin/curl -L -s
 #
-#gzipCommand: /opt/local/bin/gzip
-gzipCommand: /bin/gzip
+gzipCommand: /opt/local/bin/gzip
+#gzipCommand: /bin/gzip
 #
-#tarCommand: /usr/bin/tar
-tarCommand: /bin/tar
+rmCommand: /bin/rm
 #
-collectedDir: /var/vocal/seagull/collected
+tarCommand: /usr/bin/tar
+#tarCommand: /bin/tar
+#
+seagullDir: noaa
+seagullPath: /var/vocal/seagull
 #
 mySqlUserName: seagull
 mySqlPassWord: bogus
@@ -16,6 +20,4 @@ mySqlHostName: localhost
 #
 awsAccessKey: bogus
 awsSecretKey: bogus
-#
-baseUrl: http://w1.weather.gov/xml/current_obs/
 #
