@@ -46,7 +46,7 @@ class WxArchiver:
 
         os.unlink(out_filepath)
 
-print 'start WxParserLoader'
+print 'start WxArchiver'
 
 #
 # argv[1] = configuration filename
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     finally:
         print 'finally'
 
-print 'stop WxParserLoader'
+print 'stop WxArchiver'
 
 #;;; Local Variables: ***
 #;;; mode:python ***

@@ -6,46 +6,45 @@
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import datetime
-import json
 import os
-import rfc822
 import sys
 import time
 import uuid
 import yaml
 
-from email import utils
-
-from os import system
-
-from boto import connect_sqs
-from boto.sqs.message import RawMessage
+from aws_utility import AwsUtility
 
 class WxCollector:
-    def rfc822_now(self):
-        now_tuple = datetime.datetime.now().timetuple()
-        now_time = time.mktime(now_tuple)
-        return utils.formatdate(now_time)
 
-    def log_payload(self, task_id, priority, facility, message):
-        data = {
-            'time_stamp_rfc822': self.rfc822_now(),
-            'task_id': str(task_id),
-            'priority': str(priority),
-            'facility': str(facility),
-            'message': str(message)
-        }
+    def tar_directory(self, time_stamp):
+        os.chdir(seagull_path)
 
-        message = RawMessage()
-        message.set_body(json.dumps(data))
-        return message
-    
-    def q_lookup(self, q_name):
-        sqs_connection = connect_sqs(aws_accesskey, aws_secretkey)
-        return sqs_connection.lookup(q_name)
+        out_filename = "noaa%d.tgz" % (time_stamp)
+        command = "%s -cvzf /tmp/%s %s" % (tar_command, out_filename, seagull_dir)
+        print command
+        os.system(command)
 
-    def q_writer(self, qqq, payload):
-        status = qqq.write(payload)
+        command = "%s -rf %s" % (rm_command, seagull_dir)
+        print command
+        os.system(command)
+
+        return out_filename
+
+    def archiver(self, time_stamp):
+        """
+        tar collected files and write to S3
+        """
+        tar_filename = self.tar_directory(time_stamp)
+
+        s3directory = "noaa/noaa-%d-%2.2d" % (datetime.datetime.today().year, datetime.datetime.today().month)
+        s3filename = "%s/%s" % (s3directory, tar_filename)
+
+        os.chdir('/tmp')
+
+        aws = AwsUtility(aws_accesskey, aws_secretkey)
+        aws.s3writer('vocal-digiburo-com', s3filename, tar_filename)
+
+        os.unlink(tar_filename)
 
     def collection(self, stations):
         """
@@ -54,22 +53,26 @@ class WxCollector:
         time_now = int(round(time.time()));
 
         collection_dir = "%s/%s" % (seagull_path, seagull_dir)
+
+        if os.path.exists(collection_dir) is False:
+            os.mkdir(collection_dir, 0775)
+
         os.chdir(collection_dir)
 
         for station in stations:
             file_name = "%s.%d" % (station, time_now)
             command = "%s http://w1.weather.gov/xml/current_obs/%s.xml > %s" % (curl_command, station, file_name)
             print command
-            system(command)
+            os.system(command)
+
+        return time_now
 
     def execute(self, task_id):
         start_time = time.time()
 
-        qqq = self.q_lookup('greasy-tool')
+        aws = AwsUtility(aws_accesskey, aws_secretkey)
+        aws.log_writer(task_id, 'info', 'vocal.seagull', 'collection start')
 
-        payload = self.log_payload(task_id, 'info', 'vocal.seagull', 'application start')
-        self.q_writer(qqq, payload)
-        
         stations = [
             'KVBG', 'KNSI', 'KWMC', 'KOTH', 'KPDT', 'KRNO', 'KSBP', 'KPDX', 'KSIY', 'KCIC',
             'KRNM', 'KMUO', 'KGCD', 'KORD', 'KBOK', 'KHAF', 'KCVO', 'KOMA', 'KPIR', 'KONP',
@@ -83,10 +86,13 @@ class WxCollector:
             'KSTL', 'KAAT', 'KFOT', 'PAJN', 'PANC'
         ]
 
-        self.collection(stations)
+        time_stamp = self.collection(stations)
+        self.archiver(time_stamp)
 
         stop_time = time.time()
-        return stop_time - start_time
+        duration = stop_time - start_time
+        log_message = "collection stop w/time_stamp %d and duration %d" % (time_stamp, duration)
+        aws.log_writer(task_id, 'info', 'vocal.seagull', log_message)
 
 print 'start WxCollector'
 
@@ -106,6 +112,8 @@ if __name__ == '__main__':
     aws_secretkey = configuration['awsSecretKey']
 
     curl_command = configuration['curlCommand']
+    rm_command = configuration['rmCommand']
+    tar_command = configuration['tarCommand']
 
     seagull_path = configuration['seagullPath']
     seagull_dir = configuration['seagullDir']
