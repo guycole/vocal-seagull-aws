@@ -10,6 +10,8 @@ import time
 
 from email import utils
 
+import boto.sqs
+
 from boto import connect_sqs
 from boto.sqs.message import RawMessage
 
@@ -21,7 +23,8 @@ from boto.s3.key import Key
 
 class AwsUtility:
 
-    def __init__(self, aws_accesskey, aws_secretkey):
+    def __init__(self, aws_region, aws_accesskey, aws_secretkey):
+        self.region = aws_region
         self.accesskey = aws_accesskey
         self.secretkey = aws_secretkey
 
@@ -43,18 +46,11 @@ class AwsUtility:
         message.set_body(json.dumps(data))
         return message
 
-    def q_lookup(self, q_name):
-        sqs_connection = connect_sqs(self.accesskey, self.secretkey)
-        return sqs_connection.lookup(q_name)
-
-    def q_writer(self, qqq, payload):
-        status = qqq.write(payload)
-        return status
-
     def log_writer(self, task_id, priority, facility, message):
-        qqq = self.q_lookup('greasy-tool')
         payload = self.log_payload(task_id, priority, facility, message)
-        self.q_writer(qqq, payload)
+        connection = boto.sqs.connect_to_region(self.region, aws_access_key_id=self.accesskey, aws_secret_access_key=self.secretkey)
+        qqq = connection.create_queue('greasy-tool')
+        status = qqq.write(payload)
 
     def s3writer(self, bucket_name, remote_filename, local_filename):
         s3connection = S3Connection(self.accesskey, self.secretkey)

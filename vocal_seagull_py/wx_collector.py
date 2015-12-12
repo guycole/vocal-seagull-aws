@@ -41,7 +41,7 @@ class WxCollector:
 
         os.chdir('/tmp')
 
-        aws = AwsUtility(aws_accesskey, aws_secretkey)
+        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
         aws.s3writer('vocal-digiburo-com', s3filename, tar_filename)
 
         os.unlink(tar_filename)
@@ -70,7 +70,7 @@ class WxCollector:
     def execute(self, task_id):
         start_time = time.time()
 
-        aws = AwsUtility(aws_accesskey, aws_secretkey)
+        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
         aws.log_writer(task_id, 'info', 'vocal.seagull', 'collection start')
 
         stations = [
