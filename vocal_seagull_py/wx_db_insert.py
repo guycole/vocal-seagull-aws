@@ -1,5 +1,5 @@
 #
-# Title:wx_loader2.py
+# Title:wx_db_insert.py
 # Description: load an observation into MySql
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
@@ -13,7 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class WxLoader2:
+class WxDbInsert:
 
     def converter(self, observation, key):
         try :

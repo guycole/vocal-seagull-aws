@@ -15,17 +15,18 @@ import yaml
 from aws_utility import AwsUtility
 
 from wx_qreader import WxSqsReader
+from wx_db_insert import WxDbInsert
+from wx_xml_parser import WxXmlParser
 
-#from wx_loader2 import WxLoader
-#from wx_xml_parser import WxXmlParser
-
-import boto.sqs
-
-from boto.s3.connection import S3Connection
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 class WxLoader:
 
     def loader(self, session):
+        success = 0
+        failure = 0
+
         os.chdir("%s/noaa" % (loader_dir))
         targets = os.listdir('.')
 
@@ -34,7 +35,7 @@ class WxLoader:
             parser = WxXmlParser()
             parser.execute(target)
 
-            loader = WxLoader()
+            loader = WxDbInsert()
             if loader.execute(parser.key_value, session):
                 success = success+1
             else:
@@ -49,16 +50,19 @@ class WxLoader:
         aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
         aws.log_writer(task_id, 'info', 'vocal.seagull', 'qreader start')
 
-        sqsReader = WxSqsReader()
-        population = sqsReader.queue_poller('vocal-digiburo-com', 'vocal-fresh-file')
+        sqsReader = WxSqsReader(aws_region, aws_accesskey, aws_secretkey, tar_command, rm_command)
+        population = sqsReader.queue_poller('vocal-digiburo-com', 'vocal-fresh-file', loader_dir)
 
-        mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
+        print "population:%d" % (population)
+        population = 1
+        if (population > 0):
+            mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
 
-        engine = create_engine(mysql_url, echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+            engine = create_engine(mysql_url, echo=False)
+            Session = sessionmaker(bind=engine)
+            session = Session()
 
-#        self.loader(session)
+            self.loader(session)
 
         stop_time = time.time()
         duration = stop_time - start_time
@@ -87,10 +91,10 @@ if __name__ == '__main__':
 
     loader_dir = configuration['loaderDir']
 
-    mysql_username = configuration['archiverMySqlUserName']
-    mysql_password = configuration['archiverMySqlPassWord']
-    mysql_hostname = configuration['archiverMySqlHostName']
-    mysql_database = configuration['archiverMySqlDataBase']
+    mysql_username = configuration['mySqlUserName']
+    mysql_password = configuration['mySqlPassWord']
+    mysql_hostname = configuration['mySqlHostName']
+    mysql_database = configuration['mySqlDataBase']
 
     duration = 0
 
