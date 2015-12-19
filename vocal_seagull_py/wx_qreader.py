@@ -1,26 +1,9 @@
-#! /usr/bin/python
 #
-# Title:wx_qreader.py
-# Description:poll SQS for fresh file alerts and process file when available
-# Development Environment:OS X 10.10.5/Python 2.7.7
+# Title:qreader.py
+# Description:
+# Development Environment:OS X 10.9.3/Python 2.7.7
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import json
-import os
-import sys
-import time
-import uuid
-import yaml
-
-from aws_utility import AwsUtility
-
-from wx_loader import WxLoader
-from wx_xml_parser import WxXmlParser
-
-import boto.sqs
-
-from boto.s3.connection import S3Connection
-
 class WxSqsReader:
 
     def s3read(self, s3_filename, s3bucket):
@@ -48,6 +31,7 @@ class WxSqsReader:
 
         return False
 
+
     def queue_poller(self, bucket_name, queue_name):
         s3connection = S3Connection(aws_accesskey, aws_secretkey)
         s3bucket = s3connection.get_bucket(bucket_name)
@@ -72,76 +56,3 @@ class WxSqsReader:
             results = queue.get_messages(10)
 
         return counter
-
-    def loader(self, session):
-        os.chdir("%s/noaa" % (loader_directory))
-        targets = os.listdir('.')
-
-        for target in targets:
-            print target
-            parser = WxXmlParser()
-            parser.execute(target)
-
-            loader = WxLoader()
-            if loader.execute(parser.key_value, session):
-                success = success+1
-            else:
-                failure = failure+1
-
-        message = "load complete success:%d failure:%d" % (success, failure)
-        print message
-
-    def execute(self, task_id):
-        start_time = time.time()
-
-        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
-        aws.log_writer(task_id, 'info', 'vocal.seagull', 'qreader start')
-
-        population = self.queue_poller('vocal-digiburo-com', 'vocal-fresh-file')
-
-        mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
-
-        engine = create_engine(mysql_url, echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-
-        self.loader(session)
-
-        stop_time = time.time()
-        duration = stop_time - start_time
-        log_message = "qreader stop w/population %d and duration %d" % (population, duration)
-        aws.log_writer(task_id, 'info', 'vocal.seagull', log_message)
-
-print 'start'
-
-#
-# argv[1] = configuration filename
-#
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        yaml_filename = sys.argv[1]
-    else:
-        yaml_filename = 'config.yaml'
-
-    configuration = yaml.load(file(yaml_filename))
-
-    aws_region = configuration['awsRegion']
-    aws_accesskey = configuration['awsAccessKey']
-    aws_secretkey = configuration['awsSecretKey']
-
-    rm_command = configuration['rmCommand']
-    tar_command = configuration['tarCommand']
-
-    loader_directory = configuration['loaderDirectory']
-
-    mysql_username = configuration['archiverMySqlUserName']
-    mysql_password = configuration['archiverMySqlPassWord']
-    mysql_hostname = configuration['archiverMySqlHostName']
-    mysql_database = configuration['archiverMySqlDataBase']
-
-    duration = 0
-
-    driver = WxSqsReader()
-    driver.execute(uuid.uuid4())
-
-print 'stop'

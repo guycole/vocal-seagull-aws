@@ -124,13 +124,8 @@ if __name__ == '__main__':
     seagull_path = configuration['seagullPath']
     seagull_dir = configuration['seagullDir']
 
-#    try:
     driver = WxCollector()
     driver.execute(uuid.uuid4())
-#    except:
-#        print 'exception'
-#    finally:
-#        print 'finally'
 
 print 'stop WxCollector'
 

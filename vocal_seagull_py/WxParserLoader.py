@@ -12,7 +12,7 @@ import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from wx_loader import WxLoader
+from wx_loader2 import WxLoader
 from wx_xml_parser import WxXmlParser
 
 class WxParserLoader:

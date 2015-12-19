@@ -1,67 +1,100 @@
+#! /usr/bin/python
 #
 # Title:wx_loader.py
-# Description: load an observation into MySql
-# Development Environment:OS X 10.8.5/Python 2.7.2
+# Description:poll SQS for fresh file alerts and process file when available
+# Development Environment:OS X 10.10.5/Python 2.7.7
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import datetime
-import rfc822
+import json
+import os
+import sys
+import time
+import uuid
+import yaml
 
-from sql_table import Observation
+from aws_utility import AwsUtility
 
-from sqlalchemy.ext.declarative import declarative_base
+from wx_qreader import WxSqsReader
 
-Base = declarative_base()
+#from wx_loader2 import WxLoader
+#from wx_xml_parser import WxXmlParser
+
+import boto.sqs
+
+from boto.s3.connection import S3Connection
 
 class WxLoader:
 
-    def converter(self, observation, key):
-        try :
-            return observation[key].strip()
-        except:
-            return ''
+    def loader(self, session):
+        os.chdir("%s/noaa" % (loader_dir))
+        targets = os.listdir('.')
 
-    def execute(self, observation, session):
-        station_id = observation['station_id']
-        if len(station_id) < 1:
-            return False
+        for target in targets:
+            print target
+            parser = WxXmlParser()
+            parser.execute(target)
 
-        raw_time = observation['observation_time_rfc822']
-        parsed_time = datetime.datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(raw_time)))
+            loader = WxLoader()
+            if loader.execute(parser.key_value, session):
+                success = success+1
+            else:
+                failure = failure+1
 
-        selected_set = session.query(Observation).filter_by(station = station_id, time_stamp = parsed_time).all()
-        for selected in selected_set:
-            return False
+        message = "load complete success:%d failure:%d" % (success, failure)
+        print message
 
-        obs = Observation(station_id, parsed_time)
-        obs.location = self.converter(observation, 'location')
-        obs.latitude = self.converter(observation, 'latitude')
-        obs.longitude = self.converter(observation, 'longitude')
-        obs.rfc822 = self.converter(observation, 'observation_time_rfc822')
-        obs.temp_c = self.converter(observation, 'temp_c')
-        obs.temp_f = self.converter(observation, 'temp_f')
-        obs.dewpoint_c = self.converter(observation, 'dewpoint_c')
-        obs.dewpoint_f = self.converter(observation, 'dewpoint_f')
-        obs.relative_humidity = self.converter(observation, 'relative_humidity')
-        obs.visibility_mi = self.converter(observation, 'visibility_mi')
-        obs.weather = self.converter(observation, 'weather')
-        obs.wind_degrees = self.converter(observation, 'wind_degrees')
-        obs.wind_kt = self.converter(observation, 'wind_kt')
-        obs.wind_mph = self.converter(observation, 'wind_mph')
-        obs.pressure_in = self.converter(observation, 'pressure_in')
-        obs.pressure_mb = self.converter(observation, 'pressure_mb')
-        obs.heat_index_c = self.converter(observation, 'heat_index_c')
-        obs.heat_index_f = self.converter(observation, 'heat_index_f')
-        obs.windchill_c = self.converter(observation, 'windchill_c')
-        obs.windchill_f = self.converter(observation, 'windchill_f')
-        obs.wind_gust_kt = self.converter(observation, 'wind_gust_kt')
-        obs.wind_gust_mph = self.converter(observation, 'wind_gust_mph')
+    def execute(self, task_id):
+        start_time = time.time()
 
-        session.add(obs)
-        session.commit()
+        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
+        aws.log_writer(task_id, 'info', 'vocal.seagull', 'qreader start')
 
-        return True
+        sqsReader = WxSqsReader()
+        population = sqsReader.queue_poller('vocal-digiburo-com', 'vocal-fresh-file')
 
-#;;; Local Variables: ***
-#;;; mode:python ***
-#;;; End: ***
+        mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
+
+        engine = create_engine(mysql_url, echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+#        self.loader(session)
+
+        stop_time = time.time()
+        duration = stop_time - start_time
+        log_message = "qreader stop w/population %d and duration %d" % (population, duration)
+        aws.log_writer(task_id, 'info', 'vocal.seagull', log_message)
+
+print 'start'
+
+#
+# argv[1] = configuration filename
+#
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        yaml_filename = sys.argv[1]
+    else:
+        yaml_filename = 'config.yaml'
+
+    configuration = yaml.load(file(yaml_filename))
+
+    aws_region = configuration['awsRegion']
+    aws_accesskey = configuration['awsAccessKey']
+    aws_secretkey = configuration['awsSecretKey']
+
+    rm_command = configuration['rmCommand']
+    tar_command = configuration['tarCommand']
+
+    loader_dir = configuration['loaderDir']
+
+    mysql_username = configuration['archiverMySqlUserName']
+    mysql_password = configuration['archiverMySqlPassWord']
+    mysql_hostname = configuration['archiverMySqlHostName']
+    mysql_database = configuration['archiverMySqlDataBase']
+
+    duration = 0
+
+    driver = WxLoader()
+    driver.execute(uuid.uuid4())
+
+print 'stop'

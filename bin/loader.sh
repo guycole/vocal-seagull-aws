@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Title:qreader.sh
+# Title:loader.sh
 #
 # Description:
 #   read SQS to discover fresh S3 files
@@ -23,5 +23,5 @@ PYTHONPATH=/Users/gsc/PycharmProjects/vocal-seagull-aws; export PYTHONPATH
 #AWS_ACCESS_KEY_ID = "bogus"; export AWS_ACCESS_KEY_ID
 #AWS_SECRET_ACCESS_KEY = "bogus"; export AWS_SECRET_ACCESS_KEY
 #
-/Users/gsc/PycharmProjects/vocal-seagull-aws/vocal_seagull_py/wx_qreader.py /var/vocal/config.yaml
+/Users/gsc/PycharmProjects/vocal-seagull-aws/vocal_seagull_py/wx_loader.py /var/vocal/config.yaml
 #
