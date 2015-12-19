@@ -5,18 +5,12 @@
 # Development Environment:OS X 10.10.5/Python 2.7.7
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import datetime
 import json
 import os
 import sys
 import time
 import uuid
 import yaml
-
-#from sqlalchemy import create_engine
-#from sqlalchemy.orm import sessionmaker
-#from sql_table import ApplicationLog
-#from sql_table import TaskLog
 
 from aws_utility import AwsUtility
 
