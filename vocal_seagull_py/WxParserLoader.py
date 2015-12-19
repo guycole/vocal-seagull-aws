@@ -12,8 +12,8 @@ import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from WxLoader import WxLoader
-from WxXmlParser import WxXmlParser
+from wx_loader import WxLoader
+from wx_xml_parser import WxXmlParser
 
 class WxParserLoader:
 

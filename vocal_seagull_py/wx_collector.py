@@ -17,6 +17,9 @@ from aws_utility import AwsUtility
 class WxCollector:
 
     def tar_directory(self, time_stamp):
+        """
+        tar collection directory
+        """
         os.chdir(seagull_path)
 
         out_filename = "noaa%d.tgz" % (time_stamp)
@@ -68,6 +71,9 @@ class WxCollector:
         return time_now
 
     def execute(self, task_id):
+        """
+        prepare for collection
+        """
         start_time = time.time()
 
         aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)

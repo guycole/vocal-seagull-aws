@@ -1,16 +1,13 @@
 #
-# Title:WxLoader.py
-# Description:
+# Title:wx_loader.py
+# Description: load an observation into MySql
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import datetime
 import rfc822
 
-from SqlTable import Observation
-
-from sqlalchemy import Column
-from sqlalchemy import BigInteger, Boolean, Date, DateTime, Float, Integer, String
+from sql_table import Observation
 
 from sqlalchemy.ext.declarative import declarative_base
 

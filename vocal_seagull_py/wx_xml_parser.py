@@ -1,10 +1,9 @@
 #
-# Title:WxXmlParser.py
+# Title:wx_xml_parser.py
 # Description:read and parse a weather service XML file
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import sys
 import xml.parsers.expat
 
 class WxXmlParser:
