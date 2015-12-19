@@ -21,10 +21,13 @@ import boto.sqs
 
 from boto.s3.connection import S3Connection
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 class WxSqsReader:
 
     def s3read(self, s3_filename, s3bucket):
-        os.chdir(loader_directory)
+        os.chdir(loader_dir)
 
         temp = s3_filename.split('/')
         fresh_filename = temp[len(temp)-1]
@@ -74,8 +77,11 @@ class WxSqsReader:
         return counter
 
     def loader(self, session):
-        os.chdir("%s/noaa" % (loader_directory))
+        os.chdir("%s/noaa" % (loader_dir))
         targets = os.listdir('.')
+
+        success = 0
+        failure = 0
 
         for target in targets:
             print target
@@ -132,12 +138,12 @@ if __name__ == '__main__':
     rm_command = configuration['rmCommand']
     tar_command = configuration['tarCommand']
 
-    loader_directory = configuration['loaderDirectory']
+    loader_dir = configuration['loaderDir']
 
-    mysql_username = configuration['archiverMySqlUserName']
-    mysql_password = configuration['archiverMySqlPassWord']
-    mysql_hostname = configuration['archiverMySqlHostName']
-    mysql_database = configuration['archiverMySqlDataBase']
+    mysql_username = configuration['mySqlUserName']
+    mysql_password = configuration['mySqlPassWord']
+    mysql_hostname = configuration['mySqlHostName']
+    mysql_database = configuration['mySqlDataBase']
 
     duration = 0
 
