@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1101ec16-867d-4da1-af30-6cc6fdcc62fd" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/vocal_seagull_py/WxArchiver.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/vocal_seagull_py/WxParserLoader.py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/vocal_seagull_py/wx_loader2.py" afterPath="$PROJECT_DIR$/vocal_seagull_py/wx_db_insert.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vocal_seagull_py/wx_loader.py" afterPath="$PROJECT_DIR$/vocal_seagull_py/wx_loader.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vocal_seagull_py/wx_qreader.py" afterPath="$PROJECT_DIR$/vocal_seagull_py/wx_qreader.py" />
-    </list>
+    <list default="true" id="1101ec16-867d-4da1-af30-6cc6fdcc62fd" name="Default" comment="" />
     <ignored path="vocal-seagull-aws.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
