@@ -54,7 +54,6 @@ class WxLoader:
         population = sqsReader.queue_poller('vocal-digiburo-com', 'vocal-fresh-file', loader_dir)
 
         print "population:%d" % (population)
-        population = 1
         if (population > 0):
             mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
 
@@ -63,6 +62,11 @@ class WxLoader:
             session = Session()
 
             self.loader(session)
+
+        os.chdir(loader_dir)
+        command = "%s -rf noaa" % (rm_command)
+        print command
+        os.system(command)
 
         stop_time = time.time()
         duration = stop_time - start_time
