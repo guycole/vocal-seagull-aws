@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `vocal_seagull`.`observation` ;
 
 CREATE  TABLE IF NOT EXISTS `vocal_seagull`.`observation` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `time_stamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  `time_stamp` TIMESTAMP NOT NULL ,
   `station` VARCHAR(8) NOT NULL ,
   `location` VARCHAR(128) NOT NULL ,
   `latitude` VARCHAR(32) NOT NULL ,
