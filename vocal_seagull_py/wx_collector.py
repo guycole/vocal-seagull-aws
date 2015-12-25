@@ -12,42 +12,24 @@ import time
 import uuid
 import yaml
 
-from aws_utility import AwsUtility
-
 class WxCollector:
 
     def tar_directory(self, time_stamp):
         """
         tar collection directory
         """
-        os.chdir(seagull_path)
+        os.chdir(root_path)
 
-        out_filename = "noaa%d.tgz" % (time_stamp)
-        command = "%s -cvzf /tmp/%s %s" % (tar_command, out_filename, seagull_dir)
+        out_filename = "%s/noaa%d.tgz" % (export_path, time_stamp)
+        command = "%s -cvzf %s %s" % (tar_command, out_filename, noaa_dir)
         print command
         os.system(command)
 
-        command = "%s -rf %s" % (rm_command, seagull_dir)
+        command = "%s -rf %s" % (rm_command, noaa_dir)
         print command
         os.system(command)
 
         return out_filename
-
-    def archiver(self, time_stamp):
-        """
-        tar collected files and write to S3
-        """
-        tar_filename = self.tar_directory(time_stamp)
-
-        s3directory = "noaa/noaa-%d-%2.2d" % (datetime.datetime.today().year, datetime.datetime.today().month)
-        s3filename = "%s/%s" % (s3directory, tar_filename)
-
-        os.chdir('/tmp')
-
-        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
-        aws.s3writer('vocal-digiburo-com', s3filename, tar_filename)
-
-        os.unlink(tar_filename)
 
     def collection(self, stations):
         """
@@ -55,8 +37,7 @@ class WxCollector:
         """
         time_now = int(round(time.time()));
 
-        collection_dir = "%s/%s" % (seagull_path, seagull_dir)
-
+        collection_dir = "%s/%s" % (root_path, noaa_dir)
         if os.path.exists(collection_dir) is False:
             os.mkdir(collection_dir, 0775)
 
@@ -76,9 +57,6 @@ class WxCollector:
         """
         start_time = time.time()
 
-        aws = AwsUtility(aws_region, aws_accesskey, aws_secretkey)
-        aws.log_writer(task_id, 'info', 'vocal.seagull', 'collection start')
-
         stations = [
             'KVBG', 'KNSI', 'KWMC', 'KOTH', 'KPDT', 'KRNO', 'KSBP', 'KPDX', 'KSIY', 'KCIC',
             'KRNM', 'KMUO', 'KGCD', 'KORD', 'KBOK', 'KHAF', 'KCVO', 'KOMA', 'KPIR', 'KONP',
@@ -93,12 +71,12 @@ class WxCollector:
         ]
 
         time_stamp = self.collection(stations)
-        self.archiver(time_stamp)
+        self.tar_directory(time_stamp)
 
         stop_time = time.time()
         duration = stop_time - start_time
         log_message = "collection stop w/time_stamp %d and duration %d" % (time_stamp, duration)
-        aws.log_writer(task_id, 'info', 'vocal.seagull', log_message)
+        print log_message
 
 print 'start WxCollector'
 
@@ -113,16 +91,13 @@ if __name__ == '__main__':
 
     configuration = yaml.load(file(fileName))
 
-    aws_region = configuration['awsRegion']
-    aws_accesskey = configuration['awsAccessKey']
-    aws_secretkey = configuration['awsSecretKey']
-
     curl_command = configuration['curlCommand']
     rm_command = configuration['rmCommand']
     tar_command = configuration['tarCommand']
 
-    seagull_path = configuration['seagullPath']
-    seagull_dir = configuration['seagullDir']
+    export_path = configuration['exportPath']
+    root_path = configuration['rootPath']
+    noaa_dir = configuration['noaaDir']
 
     driver = WxCollector()
     driver.execute(uuid.uuid4())
