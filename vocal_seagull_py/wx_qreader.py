@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #
-# Title:wx_loader.py
+# Title:wx_qreader.py
 # Description:poll SQS for fresh file alerts and process file when available
 # Development Environment:OS X 10.10.5/Python 2.7.7
 # Author:G.S. Cole (guycole at gmail dot com)
