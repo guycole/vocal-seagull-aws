@@ -12,21 +12,9 @@ import time
 import uuid
 import yaml
 
-#from aws_utility import AwsUtility
-
-#from wx_qreader import WxSqsReader
-#from wx_db_insert import WxDbInsert
-#from wx_xml_parser import WxXmlParser
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-import boto.sqs
-from boto.sqs.message import RawMessage
-from boto.sqs.connection import SQSConnection
-from boto.exception import SQSError
-
 from boto.s3.connection import S3Connection
+
+from boto.sqs.connection import SQSConnection
 
 class WxSqsReader:
 
@@ -69,9 +57,7 @@ class WxSqsReader:
 
         return flag
 
-    def execute(self, task_id):
-        start_time = time.time()
-
+    def queue_poller(self):
         counter = 0
 
         s3connection = S3Connection()
@@ -89,6 +75,13 @@ class WxSqsReader:
                     queue.delete_message(message)
 
             results = queue.get_messages(10)
+
+        return counter
+
+    def execute(self, task_id):
+        start_time = time.time()
+
+        counter = self.queue_poller()
 
         stop_time = time.time()
         duration = stop_time - start_time
@@ -114,13 +107,6 @@ if __name__ == '__main__':
     import_path = configuration['importPath']
     root_path = configuration['rootPath']
     noaa_dir = configuration['noaaDir']
-
-    mysql_username = configuration['mySqlUserName']
-    mysql_password = configuration['mySqlPassWord']
-    mysql_hostname = configuration['mySqlHostName']
-    mysql_database = configuration['mySqlDataBase']
-
-    duration = 0
 
     driver = WxSqsReader()
     driver.execute(uuid.uuid4())
