@@ -26,6 +26,9 @@ class WxLoader:
 
         target_dir = "%s/%s" % (import_path, noaa_dir)
 
+        if os.path.exists(target_dir) is False:
+            os.mkdir(target_dir, 0775)
+
         os.chdir(target_dir)
         targets = os.listdir('.')
 
