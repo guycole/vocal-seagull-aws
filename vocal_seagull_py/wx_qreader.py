@@ -1,71 +1,128 @@
+#! /usr/bin/python
 #
-# Title:qreader.py
-# Description: poll SQS for a fresh file, read and untar
-# Development Environment:OS X 10.9.3/Python 2.7.7
+# Title:wx_loader.py
+# Description:poll SQS for fresh file alerts and process file when available
+# Development Environment:OS X 10.10.5/Python 2.7.7
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import json
 import os
+import sys
+import time
+import uuid
+import yaml
+
+#from aws_utility import AwsUtility
+
+#from wx_qreader import WxSqsReader
+#from wx_db_insert import WxDbInsert
+#from wx_xml_parser import WxXmlParser
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import boto.sqs
+from boto.sqs.message import RawMessage
+from boto.sqs.connection import SQSConnection
+from boto.exception import SQSError
 
 from boto.s3.connection import S3Connection
 
 class WxSqsReader:
 
-    def __init__(self, aws_region, aws_accesskey, aws_secretkey, tar_command, rm_command):
-        self.region = aws_region
-        self.accesskey = aws_accesskey
-        self.secretkey = aws_secretkey
-        self.tar_command = tar_command
-        self.rm_command = rm_command
+    def s3read(self, s3filename, s3bucket):
+        print s3filename
+        os.chdir(import_path)
 
-    def s3read(self, s3_filename, s3bucket, loader_dir):
-        os.chdir(loader_dir)
-
-        temp = s3_filename.split('/')
+        temp = s3filename.split('/')
         fresh_filename = temp[len(temp)-1]
 
         try:
-            s3key = s3bucket.get_key(s3_filename)
+            s3key = s3bucket.get_key(s3filename)
             s3key.get_contents_to_filename(fresh_filename)
-            print "S3 read success %s" % (s3_filename)
+            print "S3 read success %s" % (s3filename)
 
-            command = "%s -xzf %s" % (self.tar_command, fresh_filename)
+            command = "%s -xzf %s" % (tar_command, fresh_filename)
             print command
             os.system(command)
 
-            command = "%s -rf %s" % (self.rm_command, fresh_filename)
+            command = "%s -rf %s" % (rm_command, fresh_filename)
             print command
             os.system(command)
 
             return True
         except:
-            print "S3 read failure %s" % (s3_filename)
+            print "S3 read failure %s" % (s3filename)
 
         return False
 
-    def queue_poller(self, bucket_name, queue_name, loader_dir):
-        s3connection = S3Connection(self.accesskey, self.secretkey)
-        s3bucket = s3connection.get_bucket(bucket_name)
+    def parser(self, message, s3bucket):
+        flag = False
+#        print message.get_body()
+        parsed_json = json.loads(message.get_body())
+        event_name = parsed_json['Records'][0]['eventName']
+        if event_name == 'ObjectCreated:Put':
+            s3_file_object = parsed_json['Records'][0]['s3']['object']
+            key = s3_file_object['key']
+            if (key.startswith('noaa') is True):
+                flag = self.s3read(key, s3bucket)
 
-        sqs_connection = boto.sqs.connect_to_region(self.region, aws_access_key_id=self.accesskey, aws_secret_access_key=self.secretkey)
-        queue = sqs_connection.create_queue(queue_name)
+        return flag
+
+    def execute(self, task_id):
+        start_time = time.time()
 
         counter = 0
-        results = queue.get_messages(10)
+
+        s3connection = S3Connection()
+        s3bucket = s3connection.get_bucket('vocal-digiburo-com')
+
+        qconnection = SQSConnection()
+        queue = qconnection.create_queue('vocal-fresh-file')
+        results = queue.get_messages(3)
         while (len(results) > 0):
+            print "length:%d" % len(results)
             for message in results:
-                parsed_json = json.loads(message.get_body())
-                event_name = parsed_json['Records'][0]['eventName']
-                if event_name == 'ObjectCreated:Put':
-                    s3_file_object = parsed_json['Records'][0]['s3']['object']
-                    key = s3_file_object['key']
-                    flag = self.s3read(key, s3bucket, loader_dir)
-                    if flag is True:
-                        queue.delete_message(message)
-                        counter = counter + 1
+                flag = self.parser(message, s3bucket)
+                if flag is True:
+                    counter = counter + 1
+                    queue.delete_message(message)
 
             results = queue.get_messages(10)
 
-        return counter
+        stop_time = time.time()
+        duration = stop_time - start_time
+        log_message = "qreader stop w/population %d and duration %d" % (counter, duration)
+        print log_message
+
+print 'start'
+
+#
+# argv[1] = configuration filename
+#
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        yaml_filename = sys.argv[1]
+    else:
+        yaml_filename = 'config.yaml'
+
+    configuration = yaml.load(file(yaml_filename))
+
+    rm_command = configuration['rmCommand']
+    tar_command = configuration['tarCommand']
+
+    import_path = configuration['importPath']
+    root_path = configuration['rootPath']
+    noaa_dir = configuration['noaaDir']
+
+    mysql_username = configuration['mySqlUserName']
+    mysql_password = configuration['mySqlPassWord']
+    mysql_hostname = configuration['mySqlHostName']
+    mysql_database = configuration['mySqlDataBase']
+
+    duration = 0
+
+    driver = WxSqsReader()
+    driver.execute(uuid.uuid4())
+
+print 'stop'
