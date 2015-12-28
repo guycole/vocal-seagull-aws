@@ -52,8 +52,10 @@ class WxSqsReader:
         if event_name == 'ObjectCreated:Put':
             s3_file_object = parsed_json['Records'][0]['s3']['object']
             key = s3_file_object['key']
-            if (key.startswith('noaa') is True):
+            if (key.startswith(noaa_dir) is True):
                 flag = self.s3read(key, s3bucket)
+            else:
+                print "bad key:%s" % key
 
         return flag
 
