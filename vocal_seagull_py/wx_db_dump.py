@@ -10,9 +10,8 @@ import datetime
 import os
 import sys
 import time
+import uuid
 import yaml
-
-from mythic_scorer_core import mythic_scorer_sql
 
 from boto.s3.connection import S3Connection
 from boto.exception import S3ResponseError
@@ -34,26 +33,29 @@ class DumpDriver:
         s3key.key = outFileName
         s3key.set_contents_from_filename(outFilePath)
 
-    def execute(self, snapShotDirectory, dumpCommand, gzipCommand, s3connection):
-        startTime = time.time()
+    def execute(self, task_id):
+        start_time = time.time()
 
-        outFileName = "sqldump%2.2d" % datetime.datetime.today().day
-        outFilePath = "%s/%s" % (snapShotDirectory, outFileName)
-        command = "%s -u gsc mythic_scorer > %s" % (dumpCommand, outFilePath)
+        dump_name = "seagull-%d-%2.2d-%2.2d.sql.gz" % (datetime.datetime.today().year, datetime.datetime.today().month, datetime.datetime.today().day)
+        dump_path = "%s/%s" % (snapshot_dir, dump_name)
+        command = "%s -u %s -p%s %s | %s > %s" % (dump_command, mysql_username, mysql_password, mysql_database, gzip_command, dump_path)
+        print command
         os.system(command)
 
-        os.chdir(snapShotDirectory)
+        s3directory = 'dbdump-digiburo-com'
+        s3filename = "%s/%s" % (s3directory, dump_name)
 
-        command = "%s %s" % (gzipCommand, outFilePath)
-        os.system(command)
+        s3connection = S3Connection()
+        s3bucket = s3connection.get_bucket('dbdump-digiburo-com')
 
-        outFileName = "%s.gz" % outFileName
-        outFilePath = "%s/%s" % (snapShotDirectory, outFileName)
+        s3key = Key(s3bucket)
+        s3key.key = dump_name
+        s3key.set_contents_from_filename(dump_path)
 
-        self.writeToS3(outFileName, outFilePath)
+        os.unlink(dump_path)
 
-        stopTime = time.time()
-        duration = stopTime - startTime
+        stop_time = time.time()
+        duration = stop_time - start_time
 
         return duration
 
@@ -76,15 +78,15 @@ if __name__ == '__main__':
 
     snapshot_dir = configuration['snapShotPath']
 
-    mysql_username = configuration['mySqlUserName']
-    mysql_password = configuration['mySqlPassWord']
-    mysql_hostname = configuration['mySqlHostName']
-    mysql_database = configuration['mySqlDataBase']
+    mysql_username = configuration['mySqlDumpUserName']
+    mysql_password = configuration['mySqlDumpPassWord']
+    mysql_hostname = configuration['mySqlDumpHostName']
+    mysql_database = configuration['mySqlDumpDataBase']
 
     driver = DumpDriver()
     duration = driver.execute(uuid.uuid4)
 
-    logMessage = "DumpDriver end w/duration:%d" % duration
-    print logMessage
+    log_message = "DumpDriver end w/duration:%d" % duration
+    print log_message
 
 print 'stop'
