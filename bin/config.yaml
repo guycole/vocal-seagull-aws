@@ -1,6 +1,6 @@
 #
 curlCommand: /opt/local/bin/curl -L -s
-#curlCommand: /usr/bin/curl -L -s
+curlCommand: /usr/bin/curl -L -s
 #
 gzipCommand: /opt/local/bin/gzip
 #gzipCommand: /bin/gzip
@@ -10,7 +10,12 @@ rmCommand: /bin/rm
 tarCommand: /usr/bin/tar
 #tarCommand: /bin/tar
 #
-seagullDir: noaa
+#noaaDir: /vocal-seagull-aws/noaa
+noaaDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/noaa
+#
+#rootDir: /vocal-seagull-aws
+rootDir: /Users/gsc/IdeaProjects/vocal-seagull-aws
+#
 seagullPath: /var/vocal/seagull
 #
 mySqlUserName: seagull

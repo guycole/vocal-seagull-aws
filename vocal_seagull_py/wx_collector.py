@@ -5,11 +5,9 @@
 # Development Environment:OS X 10.8.5/Python 2.7.2
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import datetime
 import os
 import sys
 import time
-import uuid
 import yaml
 
 class WxCollector:
@@ -18,15 +16,15 @@ class WxCollector:
         """
         tar collection directory
         """
-        os.chdir(root_path)
+        os.chdir(root_dir)
 
-        out_filename = "%s/noaa%d.tgz" % (export_path, time_stamp)
+        out_filename = "noaa%d.tgz" % time_stamp
         command = "%s -cvzf %s %s" % (tar_command, out_filename, noaa_dir)
-        print command
+        print(command)
         os.system(command)
 
         command = "%s -rf %s" % (rm_command, noaa_dir)
-        print command
+        print(command)
         os.system(command)
 
         return out_filename
@@ -37,21 +35,20 @@ class WxCollector:
         """
         time_now = int(round(time.time()));
 
-        collection_dir = "%s/%s" % (root_path, noaa_dir)
-        if os.path.exists(collection_dir) is False:
-            os.mkdir(collection_dir, 0775)
+        if os.path.exists(noaa_dir) is False:
+            os.mkdir(noaa_dir, 0o775)
 
-        os.chdir(collection_dir)
+        os.chdir(noaa_dir)
 
         for station in stations:
             file_name = "%s.%d" % (station, time_now)
             command = "%s http://w1.weather.gov/xml/current_obs/%s.xml > %s" % (curl_command, station, file_name)
-            print command
+            print(command)
             os.system(command)
 
         return time_now
 
-    def execute(self, task_id):
+    def execute(self):
         """
         prepare for collection
         """
@@ -76,9 +73,9 @@ class WxCollector:
         stop_time = time.time()
         duration = stop_time - start_time
         log_message = "collection stop w/time_stamp %d and duration %d" % (time_stamp, duration)
-        print log_message
+        print(log_message)
 
-print 'start WxCollector'
+print('start WxCollector')
 
 #
 # argv[1] = configuration filename
@@ -89,20 +86,24 @@ if __name__ == '__main__':
     else:
         fileName = "config.yaml"
 
-    configuration = yaml.load(file(fileName))
+    with open(fileName, 'r') as stream:
+        try:
+            configuration = yaml.load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
 
     curl_command = configuration['curlCommand']
     rm_command = configuration['rmCommand']
     tar_command = configuration['tarCommand']
 
-    export_path = configuration['exportPath']
-    root_path = configuration['rootPath']
+#    export_path = configuration['exportPath']
+    root_dir = configuration['rootDir']
     noaa_dir = configuration['noaaDir']
 
     driver = WxCollector()
-    driver.execute(uuid.uuid4())
+    driver.execute()
 
-print 'stop WxCollector'
+print('stop WxCollector')
 
 #;;; Local Variables: ***
 #;;; mode:python ***
