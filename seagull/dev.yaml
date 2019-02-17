@@ -1,0 +1,25 @@
+#
+curlCommand: /usr/bin/curl -L -s
+#
+#gzipCommand: /bin/gzip
+gzipCommand: /usr/bin/gzip
+#
+rmCommand: /bin/rm
+#
+#tarCommand: /bin/tar
+tarCommand: /usr/bin/tar
+#
+exportDir: /var/vocal/seagull//vocal-seagull-aws/seagull/export
+exportDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull/export
+#
+noaaDir: /var/vocal/seagull//vocal-seagull-aws/seagull/export/noaa
+noaaDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull/export/noaa
+#
+##rootDir: /var/vocal/seagull
+rootDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull
+#
+mySqlUserName: seagull
+mySqlPassWord: bogus
+mySqlDataBase: vocal_seagull
+mySqlHostName: localhost
+#

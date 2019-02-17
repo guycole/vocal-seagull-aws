@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Title:WxCollector.py
 # Description: collect weather observations
@@ -16,7 +16,7 @@ class WxCollector:
         """
         tar collection directory
         """
-        os.chdir(root_dir)
+        os.chdir(export_dir)
 
         out_filename = "noaa%d.tgz" % time_stamp
         command = "%s -cvzf %s %s" % (tar_command, out_filename, noaa_dir)
@@ -96,8 +96,7 @@ if __name__ == '__main__':
     rm_command = configuration['rmCommand']
     tar_command = configuration['tarCommand']
 
-#    export_path = configuration['exportPath']
-    root_dir = configuration['rootDir']
+    export_dir = configuration['exportDir']
     noaa_dir = configuration['noaaDir']
 
     driver = WxCollector()
