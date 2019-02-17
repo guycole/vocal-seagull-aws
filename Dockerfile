@@ -17,5 +17,5 @@ RUN git clone https://github.com/guycole/vocal-seagull-aws.git
 WORKDIR /vocal-seagull-aws
 RUN pip3 install -r requirements.txt
 #
-ENTRYPOINT ["bin/collector.sh /var/vocal/seagull/prod.yaml"]
+ENTRYPOINT ["bin/runner.sh"]
 #
