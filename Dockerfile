@@ -12,7 +12,8 @@ RUN apt-get install -y vim
 #
 RUN pip3 install --upgrade pip
 #
-RUN git clone https://github.com/guycole/vocal-seagull-aws.git
+#RUN git clone https://github.com/guycole/vocal-seagull-aws.git
+COPY . /vocal-seagull-aws
 #
 WORKDIR /vocal-seagull-aws
 RUN pip3 install -r requirements.txt
