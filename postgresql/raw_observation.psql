@@ -1,0 +1,32 @@
+--
+-- Title: observation.psql
+-- Description: observation table
+--
+create table raw_observation (
+  id bigserial primary key,
+  date timestamp default current_timestamp not null,
+  station varchar(8) not null,
+  location varchar(128) not null,
+  latitude varchar(32) not null,
+  longitude varchar(32) not null,
+  rfc822  varchar(64) not null,
+  temp_c varchar(32) not null,
+  temp_f varchar(32) not null,
+  dewpoint_c varchar(32) not null,
+  dewpoint_f varchar(32) not null,
+  relative_humidity varchar(32) not null,
+  visibility_mi varchar(32) not null,
+  weather varchar(64) not null,
+  wind_degrees varchar(32) not null,
+  wind_kt varchar(32) not null,
+  wind_mph varchar(32) not null,
+  pressure_in varchar(32) not null,
+  pressure_mb varchar(32) not null,
+  heat_index_c varchar(32) not null,
+  heat_index_f varchar(32) not null,
+  wind_chill_c varchar(32) not null,
+  wind_chill_f varchar(32) not null,
+  wind_gust_kt varchar(32) not null,
+  wind_gust_mph varchar(32) not null
+);
+
