@@ -2,7 +2,7 @@
 #
 # Title:WxCollector.py
 # Description: collect weather observations
-# Development Environment:OS X 10.8.5/Python 2.7.2
+# Development Environment:OS X 10.8.5/Python 3
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import os
@@ -18,7 +18,7 @@ class WxCollector:
         """
         os.chdir(export_dir)
 
-        out_filename = "noaa%d.tgz" % time_stamp
+        out_filename = "%s/noaa%d.tgz" % (import_dir, time_stamp)
         command = "%s -cvzf %s %s" % (tar_command, out_filename, noaa_dir)
         print(command)
         os.system(command)
@@ -35,6 +35,7 @@ class WxCollector:
         """
         time_now = int(round(time.time()));
 
+        os.chdir(export_dir)
         if os.path.exists(noaa_dir) is False:
             os.mkdir(noaa_dir, 0o775)
 
@@ -97,6 +98,7 @@ if __name__ == '__main__':
     tar_command = configuration['tarCommand']
 
     export_dir = configuration['exportDir']
+    import_dir = configuration['importDir']
     noaa_dir = configuration['noaaDir']
 
     driver = WxCollector()

@@ -12,8 +12,11 @@ tarCommand: /usr/bin/tar
 exportDir: /var/vocal/seagull//vocal-seagull-aws/seagull/export
 exportDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull/export
 #
+importDir: /var/vocal/seagull//vocal-seagull-aws/seagull/import
+importDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull/import
+#
 noaaDir: /var/vocal/seagull//vocal-seagull-aws/seagull/export/noaa
-noaaDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull/export/noaa
+noaaDir: noaa
 #
 ##rootDir: /var/vocal/seagull
 rootDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull

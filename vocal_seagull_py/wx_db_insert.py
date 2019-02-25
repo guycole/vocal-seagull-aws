@@ -1,11 +1,11 @@
 #
 # Title:wx_db_insert.py
-# Description: load an observation into MySql
-# Development Environment:OS X 10.8.5/Python 2.7.2
+# Description: load an observation into database
+# Development Environment:OS X 10.8.5/Python 3
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import datetime
-import rfc822
+import email.utils
 
 from sql_table import Observation
 
@@ -27,11 +27,11 @@ class WxDbInsert:
             return False
 
         raw_time = observation['observation_time_rfc822']
-        parsed_time = datetime.datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(raw_time)))
+        parsed_time = email.utils.parsedate_to_datetime(raw_time)
 
-        selected_set = session.query(Observation).filter_by(station = station_id, time_stamp = parsed_time).all()
-        for selected in selected_set:
-            return False
+#        selected_set = session.query(Observation).filter_by(station = station_id, time_stamp = parsed_time).all()
+#        for selected in selected_set:
+#            return False
 
         obs = Observation(station_id, parsed_time)
         obs.location = self.converter(observation, 'location')
@@ -57,8 +57,8 @@ class WxDbInsert:
         obs.wind_gust_kt = self.converter(observation, 'wind_gust_kt')
         obs.wind_gust_mph = self.converter(observation, 'wind_gust_mph')
 
-        session.add(obs)
-        session.commit()
+#        session.add(obs)
+#        session.commit()
 
         return True
 

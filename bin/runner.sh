@@ -23,5 +23,6 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #AWS_ACCESS_KEY_ID = "bogus"; export AWS_ACCESS_KEY_ID
 #AWS_SECRET_ACCESS_KEY = "bogus"; export AWS_SECRET_ACCESS_KEY
 #
-/vocal-seagull-aws/vocal_seagull_py/wx_collector.py /var/vocal/seagull/prod.yaml
+#/vocal-seagull-aws/vocal_seagull_py/wx_collector.py /vocal-seagull-aws/seagull/prod.yaml
+/vocal-seagull-aws/vocal_seagull_py/wx_loader.py /vocal-seagull-aws/seagull/prod.yaml
 #

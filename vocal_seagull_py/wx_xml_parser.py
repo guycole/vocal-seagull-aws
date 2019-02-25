@@ -1,7 +1,7 @@
 #
 # Title:wx_xml_parser.py
 # Description:read and parse a weather service XML file
-# Development Environment:OS X 10.8.5/Python 2.7.2
+# Development Environment:OS X 10.8.5/Python 3
 # Author:G.S. Cole (guycole at gmail dot com)
 #
 import xml.parsers.expat
@@ -155,7 +155,7 @@ class WxXmlParser:
         if name == 'current_observation':
             return
 
-        print "unknown name:%s" % (name)
+        print("unknown name:%s" % name)
 
     def char_data(self, data):
         """

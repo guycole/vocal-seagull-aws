@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.6.1
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER: 'seagull'
+      - POSTGRES_PASSWORD: 'bogus'
+
+  client:
+    build: .
+    volumes:
+      - /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull:/vocal-seagull-aws/seagull
+    links:
+      - db
+    environment:
+      - PGHOST: 'db'
+      - PGDATABASE: 'postgres'
+      - PGUSER: 'postgres'
+      - PGPASSWORD: 'postgres'
