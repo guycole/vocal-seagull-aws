@@ -7,14 +7,14 @@ rmCommand: /bin/rm
 #
 tarCommand: /bin/tar
 #
-exportDir: /vocal-seagull-aws/seagull/export
+exportDir: /var/vocal/seagull/export
 #
-importDir: /vocal-seagull-aws/seagull/import
+importDir: /var/vocal/seagull/import
 #
 noaaDir: noaa
 #
-mySqlUserName: seagull
-mySqlPassWord: bogus
-mySqlDataBase: vocal_seagull
-mySqlHostName: localhost
+dbUserName: seagull
+dbPassWord: bogus
+dbDataBase: vocal_seagull
+dbHostName: localhost
 #

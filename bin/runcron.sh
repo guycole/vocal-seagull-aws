@@ -23,5 +23,5 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #AWS_ACCESS_KEY_ID = "bogus"; export AWS_ACCESS_KEY_ID
 #AWS_SECRET_ACCESS_KEY = "bogus"; export AWS_SECRET_ACCESS_KEY
 #
-docker run -d -rm -v /var/vocal/seagull:/var/vocal/seagull vocal-seagull
+docker run -d --rm -v /var/vocal/seagull:/var/vocal/seagull vocal-seagull
 #
