@@ -5,53 +5,15 @@
 # Development Environment:OS X 10.10.5/Python 3
 # Author:G.S. Cole (guycole at gmail dot com)
 #
-import json
 import os
 import sys
 import time
-import uuid
 import yaml
-
-from wx_db_insert import WxDbInsert
-from wx_xml_parser import WxXmlParser
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 class WxLoader:
-
-
-    def loader2(self, session):
-        success = 0
-        failure = 0
-
-        os.chdir(import_dir)
-        targets = os.listdir('.')
-
-        for target in targets:
-            print(target)
-            command = "%s -xf %s" % (tar_command, target)
-            print(command)
-            os.system(command)
-
-#            parser = WxXmlParser()
-#            parser.execute(target)
-
-#            inserter = WxDbInsert()
-#            if inserter.execute(parser.key_value, session):
-#                success = success+1
-#            else:
-#                failure = failure+1
-
-        message = "load complete success:%d failure:%d" % (success, failure)
-        print(message)
-
-        os.chdir(import_dir)
-#        command = "%s -rf %s" % (rm_command, noaa_dir)
-#        print(command)
-#        os.system(command)
-
-        return success
 
     def loader(self, target, session):
         print(target)
@@ -87,24 +49,24 @@ class WxLoader:
 
                 command = "%s -rf %s" % (rm_command, target)
                 print(command)
-#                os.system(command)
+                os.system(command)
 
     def execute(self):
         start_time = time.time()
 
-#        mysql_url = "mysql://%s:%s@%s:3306/%s" % (mysql_username, mysql_password, mysql_hostname, mysql_database)
-#        engine = create_engine(mysql_url, echo=False)
-#        Session = sessionmaker(bind=engine)
-#        session = Session()
-        session = None
+        db_url = 'postgresql://seagull:bogus@localhost/vocal_seagull'
 
-        population = 0
-#        population = self.loader(session)
+        db_url = "postgresql://%s:%s@%s/%s" % (db_user_name, db_pass_word, db_host_name, db_data_base)
+
+        engine = create_engine(db_url, echo=False)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
         self.discover_tar(session)
 
         stop_time = time.time()
         duration = stop_time - start_time
-        log_message = "WxLoader stop w/population %d and duration %d" % (population, duration)
+        log_message = "WxLoader stop w/duration %d" % duration
         print(log_message)
 
 print('start WxLoader')
@@ -129,6 +91,11 @@ if __name__ == '__main__':
 
     import_dir = configuration['importDir']
     noaa_dir = configuration['noaaDir']
+
+    db_data_base = configuration['dbDataBase']
+    db_host_name = configuration['dbHostName']
+    db_pass_word = configuration['dbPassWord']
+    db_user_name = configuration['dbUserName']
 
     driver = WxLoader()
     driver.execute()

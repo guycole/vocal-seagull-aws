@@ -7,7 +7,7 @@
 import datetime
 import email.utils
 
-from sql_table import Observation
+from sql_table import RawObservation
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -29,11 +29,11 @@ class WxDbInsert:
         raw_time = observation['observation_time_rfc822']
         parsed_time = email.utils.parsedate_to_datetime(raw_time)
 
-#        selected_set = session.query(Observation).filter_by(station = station_id, time_stamp = parsed_time).all()
-#        for selected in selected_set:
-#            return False
+        selected_set = session.query(RawObservation).filter_by(station = station_id, date = parsed_time).all()
+        for selected in selected_set:
+            return False
 
-        obs = Observation(station_id, parsed_time)
+        obs = RawObservation(station_id, parsed_time)
         obs.location = self.converter(observation, 'location')
         obs.latitude = self.converter(observation, 'latitude')
         obs.longitude = self.converter(observation, 'longitude')
@@ -52,13 +52,13 @@ class WxDbInsert:
         obs.pressure_mb = self.converter(observation, 'pressure_mb')
         obs.heat_index_c = self.converter(observation, 'heat_index_c')
         obs.heat_index_f = self.converter(observation, 'heat_index_f')
-        obs.windchill_c = self.converter(observation, 'windchill_c')
-        obs.windchill_f = self.converter(observation, 'windchill_f')
+        obs.wind_chill_c = self.converter(observation, 'windchill_c')
+        obs.wind_chill_f = self.converter(observation, 'windchill_f')
         obs.wind_gust_kt = self.converter(observation, 'wind_gust_kt')
         obs.wind_gust_mph = self.converter(observation, 'wind_gust_mph')
 
-#        session.add(obs)
-#        session.commit()
+        session.add(obs)
+        session.commit()
 
         return True
 

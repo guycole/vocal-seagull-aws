@@ -21,8 +21,8 @@ noaaDir: noaa
 ##rootDir: /var/vocal/seagull
 rootDir: /Users/gsc/IdeaProjects/vocal-seagull-aws/seagull
 #
-mySqlUserName: seagull
-mySqlPassWord: bogus
-mySqlDataBase: vocal_seagull
-mySqlHostName: localhost
+dbUserName: seagull
+dbPassWord: bogus
+dbDataBase: vocal_seagull
+dbHostName: localhost
 #

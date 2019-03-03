@@ -13,11 +13,11 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Observation(Base):
-    __tablename__ = 'observation'
+class RawObservation(Base):
+    __tablename__ = 'raw_observation'
 
     id = Column(BigInteger, primary_key=True)
-    time_stamp = Column(DateTime, default=datetime.datetime.utcnow)
+    date = Column(DateTime, default=datetime.datetime.utcnow)
     station = Column(String)
     location = Column(String)
     latitude = Column(String)
@@ -37,14 +37,14 @@ class Observation(Base):
     pressure_mb = Column(String)
     heat_index_c = Column(String)
     heat_index_f = Column(String)
-    windchill_c = Column(String)
-    windchill_f = Column(String)
+    wind_chill_c = Column(String)
+    wind_chill_f = Column(String)
     wind_gust_kt = Column(String)
     wind_gust_mph = Column(String)
 
     def __init__(self, station, time_stamp):
         self.station = station
-        self.time_stamp = time_stamp
+        self.date = time_stamp
         self.location = ''
         self.latitude = ''
         self.longitude = ''
@@ -63,10 +63,10 @@ class Observation(Base):
         self.pressure_mb = ''
         self.heat_index_c = ''
         self.heat_index_f = ''
-        self.windchill_c = ''
-        self.windchill_f = ''
+        self.wind_chill_c = ''
+        self.wind_chill_f = ''
         self.wind_gust_kt = ''
         self.wind_gust_mph = ''
 
     def __repr__(self):
-        return "<observation(%d, %s)>" % (self.id, self.station)
+        return "<raw_bservation(%d, %s)>" % (self.id, self.station)
