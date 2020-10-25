@@ -1,5 +1,5 @@
 #
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 #
 #ENV RUNTIME_ENV dev
 ENV RUNTIME_ENV prod
